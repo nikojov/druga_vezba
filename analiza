@@ -1,0 +1,34 @@
+def analyze_bam_file( bam_file):
+    import pysam
+    unmapped_reads=0
+    total_reads=0
+    num_mapq_zero=0
+    total_mapq=0
+    align_file= pysam.AlignmentFile(bam_file)
+    for read in align_file.fetch(until_eof=True):
+        total_reads+=1
+        if read.is_unmapped:
+            unmapped_reads+=1
+        if read.mapping_quality == 0:
+            num_mapq_zero+=1
+        else:
+            total_mapq+=read.mapping_quality
+    print("Total reads: "+ str(total_reads))
+    print("Unmapped reads: " + str(unmapped_reads))
+    print("Number of reads with mapping quality 0: " + str(num_mapq_zero))
+    avg_mapq=total_mapq/total_reads
+    avg_mapq_filt=0
+    num_mapq_nozero= total_reads-num_mapq_zero
+    if num_mapq_nozero == 0:
+        avg_mapq_filt= avg_mapq
+    else:
+        avg_mapq_filt= total_mapq/num_mapq_nozero
+    print("Average mapping quality for all reads: " + str(avg_mapq))
+    print("Average mapping quality for all reads, with 0 map quality reads filtered: " + str(avg_mapq_filt))
+    
+analyze_bam_file('/sbgenomics/project-files/merged-tumor.bam')
+Total reads: 2921629
+Unmapped reads: 17765
+Number of reads with mapping quality 0: 126628
+Average mapping quality for all reads: 55.91379158681681
+Average mapping quality for all reads, with 0 map quality reads filtered: 58.446975510921106
